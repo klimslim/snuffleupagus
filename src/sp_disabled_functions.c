@@ -83,6 +83,7 @@ static bool is_local_var_matching(zend_execute_data* execute_data, const sp_disa
     } else {
       zend_string const* const var_value_str = sp_zval_to_zend_string(var_value);
       bool match = sp_match_value(var_value_str, config_node->value, config_node->r_value);
+      zend_string_release(var_value_str);
 
       if (true == match) {
         return true;
@@ -112,7 +113,7 @@ static bool is_param_matching(zend_execute_data* execute_data,
     * and they can only take a single argument, but PHP considers them
     * differently than functions arguments. */
     *arg_name = builtin_param_name;
-    *arg_value_str = builtin_param;
+    *arg_value_str = zend_string_copy(builtin_param);
     return sp_match_value(builtin_param, config_node->value,
                           config_node->r_value);
   }
@@ -367,6 +368,10 @@ static void should_disable(zend_execute_data* execute_data,
     }
 
   next:
+    if (arg_value_str) {
+      zend_string_release(arg_value_str);
+      arg_value_str = NULL;
+    }
     config = config->next;
   }
 }
@@ -459,6 +464,10 @@ static void should_drop_on_ret(const zval* return_value,
         return;
       }
       sp_log_disable_ret(complete_function_path, ret_value_str, config_node);
+    }
+    if (ret_value_str) {
+      zend_string_release(ret_value_str);
+      ret_value_str = NULL;
     }
   next:
     config = config->next;
