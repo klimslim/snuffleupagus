@@ -111,6 +111,8 @@ static PHP_GINIT_FUNCTION(snuffleupagus) {
   SP_INIT_NULL(config_eval.whitelist);
   SP_INIT_NULL(config_wrapper.whitelist);
   SP_INIT_NULL(config_wrapper.php_stream_allowlist);
+  snuffleupagus_globals->global_regexp_const = NULL;
+  snuffleupagus_globals->global_regexp_var = NULL;
 #undef SP_INIT_NULL
 }
 
@@ -174,6 +176,22 @@ static PHP_GSHUTDOWN_FUNCTION(snuffleupagus) {
   FREE_LST(config_eval.whitelist);
   FREE_LST(config_wrapper.whitelist);
   FREE_LST(config_wrapper.php_stream_allowlist);
+if (snuffleupagus_globals->global_regexp_const) { \
+
+    sp_pcre_free(snuffleupagus_globals->global_regexp_const); \
+
+    snuffleupagus_globals->global_regexp_const = NULL; \
+
+} \
+
+if (snuffleupagus_globals->global_regexp_var) { \
+
+    sp_pcre_free(snuffleupagus_globals->global_regexp_var); \
+
+    snuffleupagus_globals->global_regexp_var = NULL; \
+
+}
+
 #undef FREE_LST
 
 
@@ -184,6 +202,13 @@ static PHP_GSHUTDOWN_FUNCTION(snuffleupagus) {
   FREE_CFG_ZSTR(config_upload_validation.script);
   FREE_CFG_ZSTR(config_eval.dump);
   FREE_CFG_ZSTR(config_eval.textual_representation);
+  FREE_CFG_ZSTR(config_readonly_exec.textual_representation); \
+
+  FREE_CFG_ZSTR(config_unserialize_noclass.textual_representation); \
+
+  FREE_CFG_ZSTR(config_encryption_key); \
+
+  FREE_CFG_ZSTR(config_cookies_env_var);
 // #undef FREE_CFG
 #undef FREE_CFG_ZSTR
 

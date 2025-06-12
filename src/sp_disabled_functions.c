@@ -267,7 +267,7 @@ void should_disable_ht(zend_execute_data* execute_data,
                    builtin_param_name, config, current_filename);
   }
 
-  efree(current_filename);
+  zend_string_release(current_filename);
 }
 
 static void should_disable(zend_execute_data* execute_data,

@@ -23,6 +23,9 @@ SP_PARSE_FN(parse_enable) {
 
   SP_SET_ENABLE_DISABLE(enable, disable, *(bool*)retval);
 
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 }
 
@@ -53,6 +56,9 @@ SP_PARSE_FN(parse_session) {
     }
   }
 
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 }
 
@@ -69,6 +75,12 @@ SP_PARSEKW_FN(parse_log_media) {
     return SP_PARSER_SUCCESS;
   }
 
+  zend_string_release_ex(value, 1);
+  zend_string_release_ex(value, 1);
+  zend_string_release_ex(value, 1);
+  zend_string_release_ex(value, 1);
+  zend_string_release_ex(value, 1);
+  zend_string_release_ex(value, 1);
   sp_log_err("config", "." SP_TOKEN_LOG_MEDIA "() only supports 'syslog' or 'php' on line %zu", kw->lineno);
 
   return SP_PARSER_ERROR;
@@ -88,6 +100,9 @@ SP_PARSE_FN(parse_unserialize_noclass) {
   SP_SET_ENABLE_DISABLE(enable, disable, cfg->enable);
 
   cfg->textual_representation = sp_get_textual_representation(parsed_rule);
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   return SP_PARSER_STOP;
 }
@@ -109,6 +124,9 @@ SP_PARSE_FN(parse_unserialize) {
   SP_SET_ENABLE_DISABLE(enable, disable, cfg->enable);
 
   cfg->textual_representation = sp_get_textual_representation(parsed_rule);
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   return SP_PARSER_STOP;
 }
@@ -135,6 +153,9 @@ SP_PARSE_FN(parse_readonly_exec) {
 
   SP_SET_ENABLE_DISABLE(enable, disable, cfg->enable);
   if (xchecks) { cfg->extended_checks = true; } else if (no_xchecks) { cfg->extended_checks = false; }
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   return SP_PARSER_STOP;
 }
@@ -164,6 +185,9 @@ SP_PARSE_FN(parse_global) {
     }
   }
 
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 }
 
@@ -181,6 +205,9 @@ SP_PARSE_FN(parse_eval_filter_conf) {
 
   cfg->textual_representation = sp_get_textual_representation(parsed_rule);
 
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 }
 
@@ -195,6 +222,9 @@ SP_PARSE_FN(parse_wrapper_whitelist) {
   SP_PROCESS_CONFIG_KEYWORDS_ERR();
 
   cfg->enabled = true;
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   return SP_PARSER_STOP;
 }
@@ -274,6 +304,9 @@ SP_PARSE_FN(parse_cookie) {
     SPCFG(cookie).cookies = sp_list_insert(SPCFG(cookie).cookies, cookie);
   }
 
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 
 err:
@@ -339,12 +372,16 @@ SP_PARSE_FN(parse_disabled_functions) {
 
   SP_SET_ENABLE_DISABLE(enable, disable, enable);
   if (disable) {
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     ret = SP_PARSER_STOP; goto out;
   }
 
 #define MUTUALLY_EXCLUSIVE(X, Y, STR1, STR2)                             \
   if (X && Y) {                                                          \
     sp_log_err("config", "Invalid configuration line for 'sp.disabled_functions': '.%s' and '.%s' are mutually exclusive on line %zu", STR1, STR2, parsed_rule->lineno); \
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     goto out;                                                  \
   }
 
@@ -365,15 +402,21 @@ SP_PARSE_FN(parse_disabled_functions) {
 
   if (!(df->r_function || df->function)) {
     sp_log_err("config", "Invalid configuration line: 'sp.disabled_functions': must take a function name on line %zu", parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     goto out;
   }
   if (df->filename && (*ZSTR_VAL(df->filename) != '/') &&
              (0 != strncmp(ZSTR_VAL(df->filename), "phar://", strlen("phar://")))) {
     sp_log_err("config", "Invalid configuration line: 'sp.disabled_functions': '.filename' must be an absolute path or a phar archive on line %zu", parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     goto out;
   }
   if (!(allow ^ drop)) {
     sp_log_err("config", "Invalid configuration line: 'sp.disabled_functions': The rule must either be a `drop` or `allow` one on line %zu", parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     goto out;
   }
 
@@ -399,6 +442,8 @@ SP_PARSE_FN(parse_disabled_functions) {
     }
     if (!df->param) {
       sp_log_err("config", "Invalid value '%s' for `param` on line %zu", ZSTR_VAL(param), parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
       goto out;
     }
   }
@@ -407,13 +452,19 @@ SP_PARSE_FN(parse_disabled_functions) {
       df->var = sp_parse_var(ZSTR_VAL(var));
       if (!df->var) {
         sp_log_err("config", "Invalid value '%s' for `var` on line %zu", ZSTR_VAL(var), parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
         goto out;
       }
     } else {
       sp_log_err("config", "Empty value in `var` on line %zu", parsed_rule->lineno);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
       goto out;
     }
   }
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   if (df->function && zend_string_equals_literal(df->function, "print")) {
     zend_string_release(df->function);
@@ -431,8 +482,15 @@ SP_PARSE_FN(parse_disabled_functions) {
       SPCFG(disabled_functions_reg_ret).disabled_functions = sp_list_insert(SPCFG(disabled_functions_reg_ret).disabled_functions, df);
     } else {
       SPCFG(disabled_functions_reg).disabled_functions = sp_list_insert(SPCFG(disabled_functions_reg).disabled_functions, df);
+  }
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
     }
   }
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 
 out:
@@ -466,6 +524,9 @@ SP_PARSE_FN(parse_upload_validation) {
     sp_log_err("config", "The `script` (%s) doesn't exist on line %zu", ZSTR_VAL(cfg->script), parsed_rule->lineno);
     return SP_PARSER_ERROR;
   }
+
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
 
   return SP_PARSER_STOP;
 }
@@ -503,6 +564,9 @@ SP_PARSE_FN(parse_ini_protection) {
     sp_log_err("config", "policy cannot be drop and silent at the same time on line %zu", parsed_rule->lineno);
     return SP_PARSER_ERROR;
   }
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 }
 
@@ -546,6 +610,9 @@ SP_PARSE_FN(parse_ini_entry) {
   entry->access = ro - rw;
 
   zend_hash_add_ptr(SPCFG(ini).entries, entry->key, entry);
+  if (param) { zend_string_release(param); param = NULL; }
+  if (var) { zend_string_release(var); var = NULL; }
+
   return SP_PARSER_STOP;
 
 err:

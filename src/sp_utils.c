@@ -249,7 +249,7 @@ const zend_string* sp_zval_to_zend_string(const zval* zv) {
       return zs;
     }
     case IS_STRING: {
-      return Z_STR_P(zv);
+      return zend_string_copy(Z_STR_P(zv));
     }
     case IS_FALSE:
       return zend_string_init(ZEND_STRL("FALSE"), 0);
